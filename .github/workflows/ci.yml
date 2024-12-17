@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - release-*
+    tags:
+      - "v*"      
   pull_request: {}
   workflow_dispatch:
     inputs:
@@ -156,8 +158,13 @@ jobs:
       # Go's pseudo-versions: https://go.dev/ref/mod#pseudo-versions.
       - name: Set Default Multi-Platform Package Version
         if: env.XPKG_VERSION == ''
-        run: echo "XPKG_VERSION=v0.0.0-$(date -d@$(git show -s --format=%ct) +%Y%m%d%H%M%S)-$(git rev-parse --short=12 HEAD)" >> $GITHUB_ENV
-
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v* ]]; then
+            echo "XPKG_VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+          else
+            echo "XPKG_VERSION=v0.0.0-$(date -d@$(git show -s --format=%ct) +%Y%m%d%H%M%S)-$(git rev-parse --short=12 HEAD)" >> $GITHUB_ENV
+          fi
+          
       - name: Push Multi-Platform Package to Upbound
         if: env.XPKG_ACCESS_ID != ''
         # XPKG repo name can't contain uppercase characters like UpboundCare, we need to lowercase if the GithubOrg contains them.
