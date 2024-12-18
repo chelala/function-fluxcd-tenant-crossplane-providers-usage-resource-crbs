@@ -1,5 +1,69 @@
-# function-template-go
-[![CI](https://github.com/crossplane/function-template-go/actions/workflows/ci.yml/badge.svg)](https://github.com/crossplane/function-template-go/actions/workflows/ci.yml)
+# Function Fluxcd Tenant Crossplane Providers Usage Resource CRBs
+This composition Function creates the necessary Cluster Role Bindings so Fluxcd Tenant Service Account can create the ProviderUsage object for every managed resource, when composition is applied as the Fluxcd Tenan Service Account defined.
+
+## Details
+If using fluxcd and using the multi tenant recommendation (https://fluxcd.io/flux/cmd/flux_create_tenant/ and https://github.com/fluxcd/flux2-multi-tenancy/tree/dev-team) upon creating XR or XRC an object will be created in for every Crossplane provider every time is used (providerusage).
+Given a Crossplane composition is created for a Fluxcd Tenant is created,  the proposed function will add the CRBs for that FluxCD Tenant, which is created in a separated namespace with SAs limited to that namespace and no permission to create ProviderUsage at the cluster level.
+
+## Usage
+Instead of fluxcd cli like:
+```bash
+# Create a tenant with access to a namespace 
+flux create tenant dev-team \
+  --with-namespace=frontend \
+  --label=environment=dev
+
+# Generate tenant namespaces and role bindings in YAML format
+flux create tenant dev-team \
+  --with-namespace=frontend \
+  --with-namespace=backend \
+  --export > dev-team.yaml
+```
+Here is snippet for an equivalent Crossplane composition and the function:
+
+```yaml
+apiVersion: apiextensions.crossplane.io/v1
+kind: Composition
+metadata:
+  name: xfluxcdtenants.gitops.idp.chelala.one
+spec:
+  compositeTypeRef:
+    apiVersion: gitops.idp.chelala.one/v1alpha1
+    kind: XFluxcdTenant
+  mode: Pipeline
+  pipeline:
+    - step: patch-and-transform
+      functionRef:
+        name: function-patch-and-transform
+      input:
+        apiVersion: pt.fn.crossplane.io/v1beta1
+        kind: Resources
+        resources:
+          - name: ftnamespace
+            base:
+         ................
+          - name: ftsa
+            base:
+         ........
+          - name: ftrb
+            base:
+          ............
+          - name: ftgitrepo
+            base:
+           ...............
+          - name: ftkusto
+            base:
+            ...............
+    - step: function-fluxcd-tenant-crossplane-providers-usage-resource-crbs
+      functionRef:
+        name: function-fluxcd-tenant-crossplane-providers-usage-resource-crbs
+    - step: automatically-detect-ready-composed-resources
+      functionRef:
+        name: function-auto-ready
+```
+
+# General Information for function-template-go
+[![CI](https://github.com/chelala/function-fluxcd-tenant-crossplane-providers-usage-resource-crbs/actions/workflows/ci.yml/badge.svg)](https://github.com/chelala/function-fluxcd-tenant-crossplane-providers-usage-resource-crbs/actions/workflows/ci.yml)
 
 A template for writing a [composition function][functions] in [Go][go].
 
