@@ -3,7 +3,7 @@ This composition Function creates the necessary Cluster Role Bindings so Fluxcd 
 
 ## Details
 If using fluxcd and using the multi tenant recommendation (https://fluxcd.io/flux/cmd/flux_create_tenant/ and https://github.com/fluxcd/flux2-multi-tenancy/tree/dev-team) upon creating XR or XRC an object will be created in for every Crossplane provider every time is used (providerusage).
-Given a Crossplane composition is created for a Fluxcd Tenant is created,  the proposed function will add the CRBs for that FluxCD Tenant, which is created in a separated namespace with SAs limited to that namespace and no permission to create ProviderUsage at the cluster level.
+Given a Crossplane composition is created for a Fluxcd Tenant is created, the composition function will add the CRBs for that FluxCD Tenant, which is created in a separated namespace with SAs limited to that namespace and no permission to create ProviderUsage at the cluster level.
 
 ## Usage
 Instead of fluxcd cli like:

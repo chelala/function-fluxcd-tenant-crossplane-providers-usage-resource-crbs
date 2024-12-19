@@ -3,4 +3,14 @@ apiVersion: meta.pkg.crossplane.io/v1beta1
 kind: Function
 metadata:
   name: function-fluxcd-tenant-crossplane-providers-usage-resource-crbs
+  annotations:
+    meta.crossplane.io/maintainer: Harold J. A. Chelala <chelala@gmail.com>
+    meta.crossplane.io/source: github.com/chelala/function-fluxcd-tenant-crossplane-providers-usage-resource-crbs
+    meta.crossplane.io/license: Apache-2.0
+    meta.crossplane.io/description: This composition Function creates the necessary Cluster Role Bindings so Fluxcd Tenant Service Account can create the ProviderUsage object for managed resources, when composition is applied as the Fluxcd Tenan Service Account defined.
+    meta.crossplane.io/readme: |
+      If using fluxcd and using the multi tenant recommendation (https://fluxcd.io/flux/cmd/flux_create_tenant/ and https://github.com/fluxcd/flux2-multi-tenancy/tree/dev-team) 
+      upon creating XR or XRC an object will be created in for every Crossplane provider time is used (providerusage).
+      Given a Crossplane composition is created for a Fluxcd Tenant is created, the composition function will 
+      add the CRBs for that the FluxCD Tenant, which is created in a separated namespace with SAs limited to that namespace and no permission to create ProviderUsage at the cluster level.
 spec: {}
